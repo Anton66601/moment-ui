@@ -5,8 +5,8 @@
   "license": "MIT",
   "type": "module",
   "author": {
-    "name": "shadcn",
-    "url": "https://twitter.com/shadcn"
+    "name": "anton",
+    "url": "https://twitter.com/anton01connor"
   },
   "workspaces": [
     "apps/*",
@@ -19,6 +19,7 @@
     "registry:build": "pnpm --filter=www build:registry && pnpm --filter=www lint:fix && pnpm format:write -- --loglevel silent",
     "registry:capture": "pnpm --filter=www registry:capture",
     "dev": "turbo run dev --parallel",
+    "dev:v4": "pnpm --filter=v4 dev",
     "shadcn-ui:dev": "turbo --filter=shadcn-ui dev",
     "shadcn-ui": "pnpm --filter=shadcn-ui start:dev",
     "shadcn-ui:test": "pnpm --filter=shadcn-ui test",
@@ -75,7 +76,6 @@
     "tailwindcss": "3.4.6",
     "tailwindcss-animate": "^1.0.5",
     "tsx": "^4.1.4",
-    "turbo": "^1.9.9",
     "vite": "^5.4.1",
     "vite-tsconfig-paths": "^4.2.0",
     "vitest": "^2.0.5"
@@ -84,6 +84,7 @@
     "@types/node": "^20.11.27",
     "@types/react": "^18.2.65",
     "@types/react-dom": "^18.2.22",
+    "turbo": "^2.4.4",
     "typescript": "^5.5.3"
   }
 }
