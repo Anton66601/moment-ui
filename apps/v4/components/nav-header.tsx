@@ -17,11 +17,6 @@ export function NavHeader() {
     <NavigationMenu>
       <NavigationMenuList className="gap-2 *:data-[slot=navigation-menu-item]:h-7 **:data-[slot=navigation-menu-link]:py-1 **:data-[slot=navigation-menu-link]:font-medium">
         <NavigationMenuItem>
-          <NavigationMenuLink asChild data-active={pathname === "/blank"}>
-            <Link href="/blank">Blank page</Link>
-          </NavigationMenuLink>
-        </NavigationMenuItem>
-        <NavigationMenuItem>
           <NavigationMenuLink asChild data-active={pathname === "/"}>
             <Link href="/">Home</Link>
           </NavigationMenuLink>
@@ -34,6 +29,11 @@ export function NavHeader() {
         <NavigationMenuItem>
           <NavigationMenuLink asChild data-active={pathname === "/forms"}>
             <Link href="/forms">Forms</Link>
+          </NavigationMenuLink>
+        </NavigationMenuItem>
+        <NavigationMenuItem>
+          <NavigationMenuLink asChild data-active={pathname === "/blank"}>
+            <Link href="/blank">Blank Page</Link>
           </NavigationMenuLink>
         </NavigationMenuItem>
       </NavigationMenuList>
