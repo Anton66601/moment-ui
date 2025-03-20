@@ -16,6 +16,7 @@
   },
   "dependencies": {
     "@hookform/resolvers": "^3.10.0",
+    "@prisma/client": "^6.5.0",
     "@radix-ui/react-accessible-icon": "^1.1.1",
     "@radix-ui/react-accordion": "^1.2.2",
     "@radix-ui/react-alert-dialog": "^1.1.5",
@@ -88,6 +89,7 @@
     "eslint-config-next": "15.2.0-canary.33",
     "prettier": "^3.4.2",
     "prettier-plugin-tailwindcss": "^0.6.11",
+    "prisma": "^6.5.0",
     "typescript": "^5"
   },
   "prettier": {

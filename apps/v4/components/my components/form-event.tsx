@@ -3,6 +3,9 @@
 import { z } from "zod"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
+import { toast } from "sonner"
+import { Loader2Icon } from "lucide-react"
+
 
 import {
   Form,
@@ -42,8 +45,33 @@ export function FormEvent() {
     },
   })
 
-  const onSubmit = (data: z.infer<typeof formSchema>) => {
-    console.log("Datos del evento:", data)
+  const onSubmit = async (data: z.infer<typeof formSchema>) => {
+    try {
+      const response = await fetch("/api/events", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          ...data,
+          // 🔧 TEMPORAL: valores fijos
+          date: new Date().toISOString(),
+          type: "asesoria",
+          timezone: "America/Mexico_City",
+          createdBy: "shadcn",
+        }),
+      })
+
+      const json = await response.json()
+      console.log("✅ Respuesta del backend:", json)
+
+      if (!json.success) throw new Error("No se pudo guardar el evento")
+
+      toast.success("Evento creado correctamente")
+    } catch (error) {
+      console.error("❌ Error:", error)
+      toast.error("Error al guardar el evento")
+    }
   }
 
   return (
@@ -52,8 +80,7 @@ export function FormEvent() {
         onSubmit={form.handleSubmit(onSubmit)}
         className="space-y-8 max-w-md"
       >
-
-        {/* Sección: Información general */}
+        {/* Información general */}
         <div className="space-y-4">
           <h3 className="text-base font-semibold">Información general</h3>
 
@@ -93,7 +120,7 @@ export function FormEvent() {
           </div>
         </div>
 
-        {/* Sección: Detalles del evento */}
+        {/* Detalles del evento */}
         <div className="space-y-4">
           <h3 className="text-base font-semibold">Detalles del evento</h3>
 
@@ -144,7 +171,7 @@ export function FormEvent() {
           />
         </div>
 
-        {/* Sección: Configuración */}
+        {/* Configuración */}
         <div className="space-y-4">
           <h3 className="text-base font-semibold">Configuración</h3>
 
@@ -165,9 +192,17 @@ export function FormEvent() {
           />
         </div>
 
-        <Button type="submit" className="w-full">
-          Guardar evento
+        <Button type="submit" className="w-full" disabled={form.formState.isSubmitting}>
+          {form.formState.isSubmitting ? (
+            <>
+              <Loader2Icon className="mr-2 h-4 w-4 animate-spin" />
+              Guardando...
+            </>
+          ) : (
+            "Guardar evento"
+          )}
         </Button>
+
       </form>
     </Form>
   )
