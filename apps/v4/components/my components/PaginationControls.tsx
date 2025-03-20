@@ -27,7 +27,7 @@ export function PaginationControls({
   return (
     <div className="flex w-full justify-end items-center gap-4 px-2">
       <div className="flex items-center gap-2 text-sm">
-        <span>rows</span>
+        <span></span> {/* rows */}
         <Select
           value={String(perPage)}
           onValueChange={(val) => onPerPageChange(Number(val))}

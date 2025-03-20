@@ -30,7 +30,9 @@ export function CustomTableCheckbox({
       ref={ref}
       checked={checked}
       onCheckedChange={onCheckedChange}
-      className="data-[state=checked]:bg-primary data-[state=checked]:text-white data-[state=indeterminate]:bg-muted data-[state=indeterminate]:text-muted-foreground"
+      className="data-[state=checked]:bg-primary data-[state=checked]:text-white
+                 data-[state=indeterminate]:bg-muted data-[state=indeterminate]:text-muted-foreground
+                 dark:data-[state=checked]:bg-white dark:data-[state=checked]:text-black"
     />
   )
 }

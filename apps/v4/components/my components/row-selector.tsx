@@ -7,7 +7,7 @@ interface RowSelectorProps {
   rows: string[]
 }
 
-export function RowSelector({ rows }: RowSelectorProps) {
+export function useRowSelector({ rows }: RowSelectorProps) {
   const [selected, setSelected] = React.useState<string[]>([])
 
   const isSelected = (id: string) => selected.includes(id)

@@ -68,3 +68,22 @@ export async function GET(req: Request) {
     totalPages,
   })
 }
+
+export async function DELETE(req: Request) {
+  try {
+    const { id } = await req.json()
+
+    if (!id) {
+      return NextResponse.json({ success: false, error: "ID is required" }, { status: 400 })
+    }
+
+    await prisma.event.delete({
+      where: { id },
+    })
+
+    return NextResponse.json({ success: true, message: "Event deleted successfully" })
+  } catch (error) {
+    console.error("Error deleting event:", error)
+    return NextResponse.json({ success: false, error }, { status: 500 })
+  }
+}

@@ -6,6 +6,7 @@ import { ComboboxDemo } from "@/components/combobox-demo"
 import { ButtonDemo } from "@/components/button-demo"
 import { TableDemo } from "@/components/table-demo"
 import { CheckboxDemo } from "@/components/checkbox-demo"
+import { AlertDialogDemo } from "@/components/alert-dialog-demo"
 /* ME */
 import { ComboboxEvent } from "@/components/my components/combobox"
 import { FormEvent } from "@/components/my components/form-event"
@@ -15,6 +16,8 @@ import { EventSearchBar } from "@/components/my components/event-search-bar"
 import { PaginationControls } from "@/components/my components/PaginationControls"
 import { ColumnToggle } from "@/components/my components/column-toggle"
 import { EventChekbox } from "@/components/my components/checkbox-event"
+// import { EventAlertDialog } from "@/components/my components/event-alert-dialog"
+import { AlertEvent } from "@/components/my components/alert"
 
 export default function BlankPage() {
   return (
@@ -25,6 +28,7 @@ export default function BlankPage() {
       {/* <ButtonDemo /> */}
       {/* < TableDemo/> */}
       {/* < CheckboxDemo/> */}
+      {/* < AlertDialogDemo/> */}
       {/* ---ME--- */}
       {/* <ComboboxEvent /> */}
       {/* <FormEvent /> */}
@@ -33,6 +37,8 @@ export default function BlankPage() {
       {/* <PaginationControls /> */}
       {/* <ColumnToggle /> */}
       {/* < EventChekbox/> */}
+      {/* < EventAlertDialog/> */}
+      {/* < AlertEvent/> */}
 
 
       {/* cards */}
@@ -40,9 +46,9 @@ export default function BlankPage() {
         <FormEvent />
         </div> */}
 
-      <div className="rounded-lg border bg-card p-6 shadow-sm">
+      {/* <div className="rounded-lg border bg-card p-6 shadow-sm">
+      </div> */}
       < EventTable/>
-      </div>
 
 
       
