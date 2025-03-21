@@ -31,25 +31,29 @@ export function EventCreationModal({ open, onOpenChange, onCreate }: EventCreati
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     if (!name.trim()) return
-
+  
     setLoading(true)
-
-    const newEvent = {
-      value: name.toLowerCase().replace(/\s+/g, "-"),
-      label: name,
-    }
-
+  
     try {
       const res = await fetch("/api/event-types", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name: newEvent.value, label: newEvent.label }),
+        body: JSON.stringify({
+          name: name.toLowerCase().replace(/\s+/g, "-"),
+          label: name,
+        }),
       })
-
+  
       const data = await res.json()
-
+  
       if (data.success) {
         toast.success("Tipo de evento creado correctamente")
+  
+        const newEvent = {
+          value: data.eventType.id, 
+          label: data.eventType.label,
+        }
+  
         onCreate(newEvent)
         setName("")
         onOpenChange(false)
@@ -63,6 +67,7 @@ export function EventCreationModal({ open, onOpenChange, onCreate }: EventCreati
       setLoading(false)
     }
   }
+  
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>

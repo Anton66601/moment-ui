@@ -17,7 +17,7 @@ import { PaginationControls } from "@/components/my components/PaginationControl
 import { ColumnToggle } from "@/components/my components/column-toggle"
 import { EventChekbox } from "@/components/my components/checkbox-event"
 import { EventAlertDialog } from "@/components/my components/event-alert-dialog"
-import { AlertEvent } from "@/components/my components/alert"
+import { AlertEvent } from "@/components/my components/structure/alert"
 import { EventCombobox } from "@/components/combobox/event-combobox"
 import { UserCombobox } from "@/components/combobox/user-combobox"
 import { TimezoneCombobox } from "@/components/combobox/timezone-combobox"

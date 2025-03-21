@@ -23,6 +23,8 @@ import {
 } from "@/registry/new-york-v4/ui/popover"
 import { cn } from "@/lib/utils"
 import { EventCreationModal } from "@/components/my components/modals/event-creation-modal"
+import { RowActions } from "@/components/shared/row-actions"
+import { toast } from "sonner"
 
 type Event = {
   value: string
@@ -35,7 +37,6 @@ export function EventCombobox() {
   const [events, setEvents] = React.useState<Event[]>([])
   const [showModal, setShowModal] = React.useState(false)
 
-  // Cargar los tipos de evento desde la API al montar el componente
   React.useEffect(() => {
     const fetchEvents = async () => {
       try {
@@ -43,7 +44,7 @@ export function EventCombobox() {
         const data = await res.json()
         if (data.success) {
           const formatted = data.eventTypes.map((e: any) => ({
-            value: e.name, // o `e.id` si prefieres usar el ID como value
+            value: e.id,
             label: e.label,
           }))
           setEvents(formatted)
@@ -67,6 +68,25 @@ export function EventCombobox() {
     setOpen(false)
   }
 
+  const handleDelete = async (event: Event) => {
+    try {
+      const res = await fetch(`/api/event-types?id=${event.value}`, {
+        method: "DELETE",
+      })
+      const result = await res.json()
+
+      if (result.success) {
+        setEvents((prev) => prev.filter((e) => e.value !== event.value))
+        toast.success("Tipo de evento eliminado")
+      } else {
+        toast.error("No se pudo eliminar el tipo de evento.")
+      }
+    } catch (error) {
+      console.error("Error deleting event type:", error)
+      toast.error("Ocurrió un error al eliminar.")
+    }
+  }
+
   return (
     <>
       <Popover open={open} onOpenChange={setOpen}>
@@ -83,29 +103,41 @@ export function EventCombobox() {
             <ChevronsUpDown className="text-muted-foreground ml-2 h-4 w-4" />
           </Button>
         </PopoverTrigger>
-        <PopoverContent className="p-0">
+        <PopoverContent className="p-0 w-72">
           <Command>
             <CommandInput placeholder="Buscar tipo..." />
             <CommandList>
               <CommandEmpty>No hay coincidencias.</CommandEmpty>
               <CommandGroup>
                 {events.map((event) => (
-                  <CommandItem
+                  <div
                     key={event.value}
-                    value={event.value}
-                    onSelect={(currentValue) => {
-                      setValue(currentValue === value ? "" : currentValue)
-                      setOpen(false)
-                    }}
+                    className="flex items-center justify-between pr-2"
                   >
-                    {event.label}
-                    <CheckIcon
-                      className={cn(
-                        "ml-auto h-4 w-4",
-                        value === event.value ? "opacity-100" : "opacity-0"
-                      )}
+                    <CommandItem
+                      value={event.value}
+                      onSelect={(currentValue) => {
+                        setValue(currentValue === value ? "" : currentValue)
+                        setOpen(false)
+                      }}
+                    >
+                      {event.label}
+                      <CheckIcon
+                        className={cn(
+                          "ml-auto h-4 w-4",
+                          value === event.value ? "opacity-100" : "opacity-0"
+                        )}
+                      />
+                    </CommandItem>
+                    <RowActions
+                      id={event.value}
+                      label={event.label}
+                      onDeleted={() => {
+                        setEvents((prev) => prev.filter((e) => e.value !== event.value))
+                        if (event.value === value) setValue("")
+                      }}
                     />
-                  </CommandItem>
+                  </div>
                 ))}
               </CommandGroup>
               <CommandSeparator />
