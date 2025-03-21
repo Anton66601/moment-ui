@@ -23,12 +23,69 @@ export function UserCreationModal({ open, onClose, onSubmit }: UserCreationModal
   const [username, setUsername] = React.useState("")
   const [email, setEmail] = React.useState("")
   const [password, setPassword] = React.useState("")
+  const [confirmPassword, setConfirmPassword] = React.useState("")
   const [contact, setContact] = React.useState("")
   const [loading, setLoading] = React.useState(false)
+  const [showPassword, setShowPassword] = React.useState(false)
+
+  // Función para generar una contraseña segura
+  const generateSecurePassword = () => {
+    const length = 12
+    const charset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@¿?!¡"
+    let generated = ""
+    for (let i = 0; i < length; i++) {
+      const randomIndex = Math.floor(Math.random() * charset.length)
+      generated += charset[randomIndex]
+    }
+    return generated
+  }
+
+  const handleGeneratePassword = () => {
+    const newPassword = generateSecurePassword()
+    setPassword(newPassword)
+    setConfirmPassword(newPassword)
+    toast.success("Contraseña segura generada")
+  }
+
+  const toggleShowPassword = () => setShowPassword((prev) => !prev)
+
+  const handleContactChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    let value = e.target.value
+    // Eliminar cualquier caracter que no sea dígito
+    value = value.replace(/\D/g, "")
+    // Limitar a 10 dígitos
+    if (value.length > 10) {
+      value = value.slice(0, 10)
+    }
+    setContact(value)
+  }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    if (!username || !email || !password || !contact) return
+    // Validar campos requeridos
+    if (!username || !email || !password || !confirmPassword || !contact) {
+      toast.error("Todos los campos son obligatorios")
+      return
+    }
+
+    // Validar formato del correo electrónico
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+    if (!emailRegex.test(email)) {
+      toast.error("Por favor ingresa un correo electrónico válido")
+      return
+    }
+
+    // Validar que las contraseñas coincidan
+    if (password !== confirmPassword) {
+      toast.error("Las contraseñas no coinciden")
+      return
+    }
+
+    // Validar que el contacto tenga exactamente 10 dígitos
+    if (contact.length !== 10) {
+      toast.error("El número de contacto debe tener 10 dígitos")
+      return
+    }
 
     setLoading(true)
 
@@ -47,10 +104,12 @@ export function UserCreationModal({ open, onClose, onSubmit }: UserCreationModal
         setUsername("")
         setEmail("")
         setPassword("")
+        setConfirmPassword("")
         setContact("")
         onClose()
       } else {
-        toast.error("Error al crear el usuario")
+        // Se muestra el mensaje de error retornado por el servidor.
+        toast.error(data.error)
       }
     } catch (err) {
       console.error(err)
@@ -81,16 +140,45 @@ export function UserCreationModal({ open, onClose, onSubmit }: UserCreationModal
               onChange={(e) => setEmail(e.target.value)}
               type="email"
             />
+            <div className="relative">
+              <Input
+                placeholder="Contraseña"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                type={showPassword ? "text" : "password"}
+              />
+              <Button
+                type="button"
+                onClick={toggleShowPassword}
+                className="absolute right-2 top-1/2 -translate-y-1/2"
+                variant="ghost"
+              >
+                {showPassword ? "Ocultar" : "Mostrar"}
+              </Button>
+            </div>
+            <div className="relative">
+              <Input
+                placeholder="Confirmar contraseña"
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
+                type={showPassword ? "text" : "password"}
+              />
+              <Button
+                type="button"
+                onClick={toggleShowPassword}
+                className="absolute right-2 top-1/2 -translate-y-1/2"
+                variant="ghost"
+              >
+                {showPassword ? "Ocultar" : "Mostrar"}
+              </Button>
+            </div>
+            <Button type="button" onClick={handleGeneratePassword} variant="outline">
+              Generar contraseña segura
+            </Button>
             <Input
-              placeholder="Contraseña"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              type="password"
-            />
-            <Input
-              placeholder="Contacto"
+              placeholder="Contacto (10 dígitos)"
               value={contact}
-              onChange={(e) => setContact(e.target.value)}
+              onChange={handleContactChange}
             />
           </div>
           <DialogFooter>
