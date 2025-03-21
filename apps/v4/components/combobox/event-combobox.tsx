@@ -29,16 +29,32 @@ type Event = {
   label: string
 }
 
-const initialEvents: Event[] = [
-  { value: "asesoria", label: "Asesoría personalizada" },
-  { value: "tramite", label: "Trámites ante el SAT" },
-]
-
 export function EventCombobox() {
   const [open, setOpen] = React.useState(false)
   const [value, setValue] = React.useState("")
-  const [events, setEvents] = React.useState<Event[]>([...initialEvents])
+  const [events, setEvents] = React.useState<Event[]>([])
   const [showModal, setShowModal] = React.useState(false)
+
+  // Cargar los tipos de evento desde la API al montar el componente
+  React.useEffect(() => {
+    const fetchEvents = async () => {
+      try {
+        const res = await fetch("/api/event-types")
+        const data = await res.json()
+        if (data.success) {
+          const formatted = data.eventTypes.map((e: any) => ({
+            value: e.name, // o `e.id` si prefieres usar el ID como value
+            label: e.label,
+          }))
+          setEvents(formatted)
+        }
+      } catch (err) {
+        console.error("Error fetching event types:", err)
+      }
+    }
+
+    fetchEvents()
+  }, [])
 
   const handleCreate = () => {
     setShowModal(true)

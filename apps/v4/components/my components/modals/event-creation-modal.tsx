@@ -11,6 +11,7 @@ import {
 } from "@/registry/new-york-v4/ui/dialog"
 import { Input } from "@/registry/new-york-v4/ui/input"
 import { Button } from "@/registry/new-york-v4/ui/button"
+import { toast } from "sonner"
 
 interface EventType {
   value: string
@@ -27,7 +28,7 @@ export function EventCreationModal({ open, onOpenChange, onCreate }: EventCreati
   const [name, setName] = React.useState("")
   const [loading, setLoading] = React.useState(false)
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     if (!name.trim()) return
 
@@ -38,16 +39,33 @@ export function EventCreationModal({ open, onOpenChange, onCreate }: EventCreati
       label: name,
     }
 
-    setTimeout(() => {
-      onCreate(newEvent)
-      setName("")
+    try {
+      const res = await fetch("/api/event-types", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name: newEvent.value, label: newEvent.label }),
+      })
+
+      const data = await res.json()
+
+      if (data.success) {
+        toast.success("Tipo de evento creado correctamente")
+        onCreate(newEvent)
+        setName("")
+        onOpenChange(false)
+      } else {
+        toast.error("Error al crear el tipo de evento")
+      }
+    } catch (err) {
+      console.error(err)
+      toast.error("Ocurrió un error inesperado")
+    } finally {
       setLoading(false)
-      onOpenChange(false)
-    }, 500)
+    }
   }
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}> 
+    <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent>
         <form onSubmit={handleSubmit}>
           <DialogHeader>
