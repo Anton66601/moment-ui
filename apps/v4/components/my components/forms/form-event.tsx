@@ -19,7 +19,7 @@ import { Textarea } from "@/registry/new-york-v4/ui/textarea"
 import { Switch } from "@/registry/new-york-v4/ui/switch"
 import { Button } from "@/registry/new-york-v4/ui/button"
 
-import { DatePickerEvent } from "@/components/my components/DatePicker"
+import { DatePickerEvent } from "@/components/my components/date/DatePicker"
 import { EventCombobox } from "@/components/combobox/event-combobox"
 import { UserCombobox } from "@/components/combobox/user-combobox"
 import { TimezoneCombobox } from "@/components/combobox/timezone-combobox"

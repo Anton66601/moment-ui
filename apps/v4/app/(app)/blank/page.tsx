@@ -10,7 +10,7 @@ import { AlertDialogDemo } from "@/components/alert-dialog-demo"
 /* ME */
 import { ComboboxEvent } from "@/components/my components/combobox"
 import { FormEvent } from "@/components/my components/forms/form-event"
-import { DatePickerEvent } from "@/components/my components/DatePicker"
+import { DatePickerEvent } from "@/components/my components/date/DatePicker"
 import { EventTable } from "@/components/my components/event-table"
 import { EventSearchBar } from "@/components/my components/event-search-bar"
 import { PaginationControls } from "@/components/my components/PaginationControls"
@@ -35,7 +35,7 @@ export default function BlankPage() {
       {/* ---ME--- */}
       {/* <ComboboxEvent /> */}
       {/* <FormEvent /> */}
-      {/* <DatePickerEvent /> */}
+      <DatePickerEvent />
       {/* <EventSearchBar /> */}
       {/* <PaginationControls /> */}
       {/* <ColumnToggle /> */}
@@ -48,10 +48,10 @@ export default function BlankPage() {
 
 
       {/* cards */}
-      <div className="rounded-lg border bg-card p-6 shadow-sm">
+      {/* <div className="rounded-lg border bg-card p-6 shadow-sm">
         <FormEvent />
       </div>
-      <hr />
+      <hr /> */}
 
       {/* <div className="rounded-lg border bg-card p-6 shadow-sm">
       < EventTable/>
