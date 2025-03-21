@@ -23,6 +23,7 @@ import {
 } from "@/registry/new-york-v4/ui/popover"
 import { cn } from "@/lib/utils"
 import { EventCreationModal } from "@/components/my components/modals/event-creation-modal"
+import { EventEditModal } from "@/components/my components/modals/event-edit-modal";
 import { RowActions } from "@/components/shared/row-actions"
 import { toast } from "sonner"
 
@@ -32,60 +33,70 @@ type Event = {
 }
 
 export function EventCombobox() {
-  const [open, setOpen] = React.useState(false)
-  const [value, setValue] = React.useState("")
-  const [events, setEvents] = React.useState<Event[]>([])
-  const [showModal, setShowModal] = React.useState(false)
+  const [open, setOpen] = React.useState(false);
+  const [value, setValue] = React.useState("");
+  const [events, setEvents] = React.useState<Event[]>([]);
+  const [showModal, setShowModal] = React.useState(false);
+  const [editingEvent, setEditingEvent] = React.useState<Event | null>(null);
 
   React.useEffect(() => {
     const fetchEvents = async () => {
       try {
-        const res = await fetch("/api/event-types")
-        const data = await res.json()
+        const res = await fetch("/api/event-types");
+        const data = await res.json();
         if (data.success) {
           const formatted = data.eventTypes.map((e: any) => ({
             value: e.id,
             label: e.label,
-          }))
-          setEvents(formatted)
+          }));
+          setEvents(formatted);
         }
       } catch (err) {
-        console.error("Error fetching event types:", err)
+        console.error("Error fetching event types:", err);
       }
-    }
+    };
 
-    fetchEvents()
-  }, [])
+    fetchEvents();
+  }, []);
 
   const handleCreate = () => {
-    setShowModal(true)
-  }
+    setShowModal(true);
+  };
 
   const handleModalCreate = (newEvent: Event) => {
-    setEvents((prev) => [...prev, newEvent])
-    setValue(newEvent.value)
-    setShowModal(false)
-    setOpen(false)
-  }
+    setEvents((prev) => [...prev, newEvent]);
+    setValue(newEvent.value);
+    setShowModal(false);
+    setOpen(false);
+  };
+
+  const handleEdit = (event: Event) => {
+    setEditingEvent(event);
+  };
+
+  const handleUpdate = (updatedEvent: Event) => {
+    setEvents((prev) => prev.map((e) => (e.value === updatedEvent.value ? updatedEvent : e)));
+    setEditingEvent(null);
+  };
 
   const handleDelete = async (event: Event) => {
     try {
       const res = await fetch(`/api/event-types?id=${event.value}`, {
         method: "DELETE",
-      })
-      const result = await res.json()
+      });
+      const result = await res.json();
 
       if (result.success) {
-        setEvents((prev) => prev.filter((e) => e.value !== event.value))
-        toast.success("Tipo de evento eliminado")
+        setEvents((prev) => prev.filter((e) => e.value !== event.value));
+        toast.success("Tipo de evento eliminado");
       } else {
-        toast.error("No se pudo eliminar el tipo de evento.")
+        toast.error("No se pudo eliminar el tipo de evento.");
       }
     } catch (error) {
-      console.error("Error deleting event type:", error)
-      toast.error("Ocurrió un error al eliminar.")
+      console.error("Error deleting event type:", error);
+      toast.error("Ocurrió un error al eliminar.");
     }
-  }
+  };
 
   return (
     <>
@@ -97,9 +108,7 @@ export function EventCombobox() {
             aria-expanded={open}
             className="w-full justify-between md:max-w-[200px]"
           >
-            {value
-              ? events.find((event) => event.value === value)?.label
-              : "Selecciona un tipo"}
+            {value ? events.find((event) => event.value === value)?.label : "Selecciona un tipo"}
             <ChevronsUpDown className="text-muted-foreground ml-2 h-4 w-4" />
           </Button>
         </PopoverTrigger>
@@ -110,15 +119,12 @@ export function EventCombobox() {
               <CommandEmpty>No hay coincidencias.</CommandEmpty>
               <CommandGroup>
                 {events.map((event) => (
-                  <div
-                    key={event.value}
-                    className="flex items-center justify-between pr-2"
-                  >
+                  <div key={event.value} className="flex items-center justify-between pr-2">
                     <CommandItem
                       value={event.value}
                       onSelect={(currentValue) => {
-                        setValue(currentValue === value ? "" : currentValue)
-                        setOpen(false)
+                        setValue(currentValue === value ? "" : currentValue);
+                        setOpen(false);
                       }}
                     >
                       {event.label}
@@ -132,9 +138,10 @@ export function EventCombobox() {
                     <RowActions
                       id={event.value}
                       label={event.label}
+                      onEdit={() => handleEdit(event)}
                       onDeleted={() => {
-                        setEvents((prev) => prev.filter((e) => e.value !== event.value))
-                        if (event.value === value) setValue("")
+                        setEvents((prev) => prev.filter((e) => e.value !== event.value));
+                        if (event.value === value) setValue("");
                       }}
                     />
                   </div>
@@ -152,11 +159,20 @@ export function EventCombobox() {
         </PopoverContent>
       </Popover>
 
-      <EventCreationModal
-        open={showModal}
-        onOpenChange={setShowModal}
-        onCreate={handleModalCreate}
-      />
+      <EventCreationModal open={showModal} onOpenChange={setShowModal} onCreate={handleModalCreate} />
+      {editingEvent && (
+        <EventEditModal
+          open={true}
+          onOpenChange={() => setEditingEvent(null)}
+          initialData={{
+            id: editingEvent.value,
+            name: editingEvent.value,
+            label: editingEvent.label,
+          }}
+          onUpdated={handleUpdate}
+        />
+      )}
     </>
-  )
+  );
 }
+

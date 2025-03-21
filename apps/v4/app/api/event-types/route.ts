@@ -62,3 +62,31 @@ export async function DELETE(req: NextRequest) {
     return NextResponse.json({ success: false, error: "Error deleting event type" }, { status: 500 })
   }
 }
+
+// PATCH /api/event-types
+export async function PATCH(req: NextRequest) {
+  try {
+    const id = req.nextUrl.searchParams.get("id");
+    const { label } = await req.json();
+
+    if (!id || !label) {
+      return NextResponse.json(
+        { success: false, error: "ID and label are required." },
+        { status: 400 }
+      );
+    }
+
+    const updatedEventType = await prisma.eventType.update({
+      where: { id },
+      data: { label },
+    });
+
+    return NextResponse.json({ success: true, eventType: updatedEventType });
+  } catch (error) {
+    console.error("Error updating event type:", error);
+    return NextResponse.json(
+      { success: false, error: "Failed to update event type." },
+      { status: 500 }
+    );
+  }
+}

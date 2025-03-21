@@ -1,8 +1,4 @@
-// apps/v4/components/shared/row-actions.tsx
-
-"use client"
-
-import { MoreHorizontal, Trash2 } from "lucide-react"
+import { MoreHorizontal, Pencil, Trash2 } from "lucide-react"
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -16,16 +12,15 @@ interface RowActionsProps {
   id: string
   label?: string
   onDeleted?: () => void
+  onEdit?: () => void
 }
 
-export function RowActions({ id, label, onDeleted }: RowActionsProps) {
+export function RowActions({ id, label, onDeleted, onEdit }: RowActionsProps) {
   const handleDelete = async () => {
     try {
-        const res = await fetch(`/api/event-types?id=${id}`, {
-            method: "DELETE",
-        })
-          
-          
+      const res = await fetch(`/api/event-types?id=${id}`, {
+        method: "DELETE",
+      })
 
       const data = await res.json()
 
@@ -48,7 +43,11 @@ export function RowActions({ id, label, onDeleted }: RowActionsProps) {
           <MoreHorizontal className="h-4 w-4" />
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="end" className="w-32">
+      <DropdownMenuContent align="end" className="w-36">
+        <DropdownMenuItem onClick={onEdit}>
+          <Pencil className="mr-2 h-4 w-4" />
+          Editar
+        </DropdownMenuItem>
         <DropdownMenuItem onClick={handleDelete} className="text-red-600">
           <Trash2 className="mr-2 h-4 w-4" />
           Eliminar
