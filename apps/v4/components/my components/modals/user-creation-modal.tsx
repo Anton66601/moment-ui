@@ -65,6 +65,7 @@ export function UserCreationModal({
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+    e.stopPropagation()
     if (!username || !email || !password || !confirmPassword || !contact) {
       toast.error("Todos los campos son obligatorios")
       return

@@ -5,18 +5,26 @@ import { PrismaClient } from "@prisma/client"
 
 const prisma = new PrismaClient()
 
+// Crear evento
 export async function POST(req: Request) {
-  const data = await req.json()
-
   try {
+    const data = await req.json()
+
+    if (!data.name || !data.date || !data.userId || !data.eventTypeId) {
+      return NextResponse.json(
+        { success: false, error: "Faltan campos obligatorios" },
+        { status: 400 }
+      )
+    }
+
     const newEvent = await prisma.event.create({
       data: {
         name: data.name,
-        description: data.description,
-        date: new Date(data.date),
-        timezone: data.timezone,
-        type: data.type,
-        createdBy: data.createdBy,
+        description: data.description ?? "",
+        date: data.date, // ISO string, no convertir
+        timezone: data.timezone ?? "UTC",
+        type: data.eventTypeId, // asumiendo que "type" es el ID del tipo de evento
+        createdBy: data.userId,
         isPublic: data.isPublic ?? true,
       },
     })
@@ -24,10 +32,14 @@ export async function POST(req: Request) {
     return NextResponse.json({ success: true, event: newEvent })
   } catch (error) {
     console.error("Error creating event:", error)
-    return NextResponse.json({ success: false, error }, { status: 500 })
+    return NextResponse.json(
+      { success: false, error: "Ocurrió un error en el servidor." },
+      { status: 500 }
+    )
   }
 }
 
+// Obtener eventos con paginación
 export async function GET(req: Request) {
   const { searchParams } = new URL(req.url)
 
@@ -63,27 +75,26 @@ export async function GET(req: Request) {
 
   const totalPages = Math.ceil(totalCount / limit)
 
-  return NextResponse.json({
-    events,
-    totalPages,
-  })
+  return NextResponse.json({ events, totalPages })
 }
 
+// Eliminar evento
 export async function DELETE(req: Request) {
   try {
     const { id } = await req.json()
 
     if (!id) {
-      return NextResponse.json({ success: false, error: "ID is required" }, { status: 400 })
+      return NextResponse.json({ success: false, error: "ID requerido" }, { status: 400 })
     }
 
-    await prisma.event.delete({
-      where: { id },
-    })
+    await prisma.event.delete({ where: { id } })
 
-    return NextResponse.json({ success: true, message: "Event deleted successfully" })
+    return NextResponse.json({ success: true, message: "Evento eliminado" })
   } catch (error) {
     console.error("Error deleting event:", error)
-    return NextResponse.json({ success: false, error }, { status: 500 })
+    return NextResponse.json(
+      { success: false, error: "Error al eliminar el evento." },
+      { status: 500 }
+    )
   }
 }

@@ -75,6 +75,7 @@ export function UserEditModal({
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+    e.stopPropagation()
 
     if (!username || !email || !contact) {
       toast.error("Todos los campos son obligatorios (excepto la contraseña)")

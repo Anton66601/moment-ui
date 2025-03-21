@@ -1,23 +1,20 @@
-import { NextRequest, NextResponse } from "next/server"
+import { NextResponse } from "next/server"
 import { PrismaClient } from "@prisma/client"
 import bcrypt from "bcryptjs"
 
 const prisma = new PrismaClient()
 
-// PATCH /api/users/:id
 export async function PATCH(
-  request: NextRequest,
+  req: Request,
   { params }: { params: { id: string } }
 ) {
   try {
-    const { username, email, contact, password } = await request.json()
+    const { username, email, contact, password } = await req.json()
 
     const dataToUpdate: any = {}
     if (username) dataToUpdate.username = username
     if (email) dataToUpdate.email = email
     if (contact) dataToUpdate.contact = contact
-
-    // Si hay password, la encriptamos
     if (password) {
       dataToUpdate.password = await bcrypt.hash(password, 10)
     }

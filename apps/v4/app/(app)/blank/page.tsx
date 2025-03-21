@@ -9,7 +9,7 @@ import { CheckboxDemo } from "@/components/checkbox-demo"
 import { AlertDialogDemo } from "@/components/alert-dialog-demo"
 /* ME */
 import { ComboboxEvent } from "@/components/my components/combobox"
-import { FormEvent } from "@/components/my components/form-event"
+import { FormEvent } from "@/components/my components/forms/form-event"
 import { DatePickerEvent } from "@/components/my components/DatePicker"
 import { EventTable } from "@/components/my components/event-table"
 import { EventSearchBar } from "@/components/my components/event-search-bar"
@@ -42,15 +42,16 @@ export default function BlankPage() {
       {/* < EventChekbox/> */}
       {/* < EventAlertDialog/> */}
       {/* < AlertEvent/> */}
-      < EventCombobox/>
-      < UserCombobox/>
-      < TimezoneCombobox/>
+      {/* < EventCombobox/> */}
+      {/* < UserCombobox/> */}
+      {/* < TimezoneCombobox/> */}
 
 
       {/* cards */}
-      {/* <div className="rounded-lg border bg-card p-6 shadow-sm">
+      <div className="rounded-lg border bg-card p-6 shadow-sm">
         <FormEvent />
-      </div> */}
+      </div>
+      <hr />
 
       {/* <div className="rounded-lg border bg-card p-6 shadow-sm">
       < EventTable/>
