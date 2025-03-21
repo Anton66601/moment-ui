@@ -1,5 +1,3 @@
-// apps/v4/components/my components/modals/user-creation-modal.tsx
-
 "use client"
 
 import * as React from "react"
@@ -14,14 +12,20 @@ import {
 import { Input } from "@/registry/new-york-v4/ui/input"
 import { Button } from "@/registry/new-york-v4/ui/button"
 import { toast } from "sonner"
+import { User } from "@/components/combobox/user-combobox"
 
 interface UserCreationModalProps {
   open: boolean
   onClose: () => void
-  onSubmit: (user: { id: string; username: string }) => void
+  // onSubmit manda el objeto completo (incluyendo email, contact) tras crearlo
+  onSubmit: (user: User) => void
 }
 
-export function UserCreationModal({ open, onClose, onSubmit }: UserCreationModalProps) {
+export function UserCreationModal({
+  open,
+  onClose,
+  onSubmit,
+}: UserCreationModalProps) {
   const [username, setUsername] = React.useState("")
   const [email, setEmail] = React.useState("")
   const [password, setPassword] = React.useState("")
@@ -30,7 +34,7 @@ export function UserCreationModal({ open, onClose, onSubmit }: UserCreationModal
   const [loading, setLoading] = React.useState(false)
   const [showPassword, setShowPassword] = React.useState(false)
 
-  // Función para generar una contraseña segura
+  // Genera una contraseña segura
   const generateSecurePassword = () => {
     const length = 12
     const charset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@¿?!¡"
@@ -52,10 +56,7 @@ export function UserCreationModal({ open, onClose, onSubmit }: UserCreationModal
   const toggleShowPassword = () => setShowPassword((prev) => !prev)
 
   const handleContactChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    let value = e.target.value
-    // Eliminar cualquier caracter que no sea dígito
-    value = value.replace(/\D/g, "")
-    // Limitar a 10 dígitos
+    let value = e.target.value.replace(/\D/g, "")
     if (value.length > 10) {
       value = value.slice(0, 10)
     }
@@ -64,26 +65,23 @@ export function UserCreationModal({ open, onClose, onSubmit }: UserCreationModal
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    // Validar campos requeridos
     if (!username || !email || !password || !confirmPassword || !contact) {
       toast.error("Todos los campos son obligatorios")
       return
     }
 
-    // Validar formato del correo electrónico
+    // Validar email
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
     if (!emailRegex.test(email)) {
       toast.error("Por favor ingresa un correo electrónico válido")
       return
     }
 
-    // Validar que las contraseñas coincidan
     if (password !== confirmPassword) {
       toast.error("Las contraseñas no coinciden")
       return
     }
 
-    // Validar que el contacto tenga exactamente 10 dígitos
     if (contact.length !== 10) {
       toast.error("El número de contacto debe tener 10 dígitos")
       return
@@ -92,6 +90,7 @@ export function UserCreationModal({ open, onClose, onSubmit }: UserCreationModal
     setLoading(true)
 
     try {
+      // Petición al endpoint de creación
       const res = await fetch("/api/users", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -102,7 +101,14 @@ export function UserCreationModal({ open, onClose, onSubmit }: UserCreationModal
 
       if (data.success) {
         toast.success("Usuario creado correctamente")
-        onSubmit({ id: data.user.id, username: data.user.username })
+        // onSubmit envía el user con la info necesaria
+        onSubmit({
+          id: data.user.id,
+          username: data.user.username,
+          email: data.user.email,
+          contact: data.user.contact,
+        })
+        // Reseteamos campos
         setUsername("")
         setEmail("")
         setPassword("")
@@ -110,8 +116,7 @@ export function UserCreationModal({ open, onClose, onSubmit }: UserCreationModal
         setContact("")
         onClose()
       } else {
-        // Se muestra el mensaje de error retornado por el servidor.
-        toast.error(data.error)
+        toast.error(data.error || "Error al crear usuario")
       }
     } catch (err) {
       console.error(err)
@@ -122,12 +127,14 @@ export function UserCreationModal({ open, onClose, onSubmit }: UserCreationModal
   }
 
   return (
-    <Dialog open={open} onOpenChange={onClose}>
+    <Dialog open={open} onOpenChange={(val) => { if (!val) onClose() }}>
       <DialogContent>
         <form onSubmit={handleSubmit}>
           <DialogHeader>
             <DialogTitle>Crear usuario</DialogTitle>
-            <DialogDescription>Introduce los datos del nuevo usuario.</DialogDescription>
+            <DialogDescription>
+              Introduce los datos del nuevo usuario.
+            </DialogDescription>
           </DialogHeader>
           <div className="space-y-3 py-4">
             <Input
@@ -142,6 +149,7 @@ export function UserCreationModal({ open, onClose, onSubmit }: UserCreationModal
               onChange={(e) => setEmail(e.target.value)}
               type="email"
             />
+            {/* Contraseña */}
             <div className="relative">
               <Input
                 placeholder="Contraseña"
@@ -158,6 +166,7 @@ export function UserCreationModal({ open, onClose, onSubmit }: UserCreationModal
                 {showPassword ? "Ocultar" : "Mostrar"}
               </Button>
             </div>
+            {/* Confirmar contraseña */}
             <div className="relative">
               <Input
                 placeholder="Confirmar contraseña"
@@ -174,9 +183,14 @@ export function UserCreationModal({ open, onClose, onSubmit }: UserCreationModal
                 {showPassword ? "Ocultar" : "Mostrar"}
               </Button>
             </div>
-            <Button type="button" onClick={handleGeneratePassword} variant="outline">
+            <Button
+              type="button"
+              onClick={handleGeneratePassword}
+              variant="outline"
+            >
               Generar contraseña segura
             </Button>
+            {/* Contacto */}
             <Input
               placeholder="Contacto (10 dígitos)"
               value={contact}
@@ -184,7 +198,11 @@ export function UserCreationModal({ open, onClose, onSubmit }: UserCreationModal
             />
           </div>
           <DialogFooter>
-            <Button type="button" variant="outline" onClick={onClose}>
+            <Button
+              type="button"
+              variant="outline"
+              onClick={onClose}
+            >
               Cancelar
             </Button>
             <Button type="submit" disabled={loading}>

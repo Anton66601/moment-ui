@@ -1,38 +1,42 @@
-// apps/v4/components/shared/user-row-actions.tsx
-import { MoreHorizontal, Pencil, Trash2 } from "lucide-react";
+import { MoreHorizontal, Pencil, Trash2 } from "lucide-react"
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from "@/registry/new-york-v4/ui/dropdown-menu";
-import { Button } from "@/registry/new-york-v4/ui/button";
-import { toast } from "sonner";
+} from "@/registry/new-york-v4/ui/dropdown-menu"
+import { Button } from "@/registry/new-york-v4/ui/button"
+import { toast } from "sonner"
 
 interface UserRowActionsProps {
-  userId: string;
-  username: string;
-  onDeleted?: () => void;
-  onEdit?: () => void;
+  userId: string
+  username: string
+  onDeleted?: () => void
+  onEdit?: () => void
 }
 
-export function UserRowActions({ userId, username, onDeleted, onEdit }: UserRowActionsProps) {
+export function UserRowActions({
+  userId,
+  username,
+  onDeleted,
+  onEdit,
+}: UserRowActionsProps) {
   const handleDelete = async () => {
     try {
-      const res = await fetch(`/api/users?id=${userId}`, { method: "DELETE" });
-      const data = await res.json();
+      const res = await fetch(`/api/users?id=${userId}`, { method: "DELETE" })
+      const data = await res.json()
 
       if (data.success) {
-        toast.success(`"${username}" eliminado`);
-        onDeleted?.();
+        toast.success(`"${username}" eliminado`)
+        onDeleted?.()
       } else {
-        toast.error("No se pudo eliminar el usuario.");
+        toast.error("No se pudo eliminar el usuario.")
       }
     } catch (err) {
-      toast.error("Ocurrió un error al eliminar.");
-      console.error(err);
+      toast.error("Ocurrió un error al eliminar.")
+      console.error(err)
     }
-  };
+  }
 
   return (
     <DropdownMenu>
@@ -52,5 +56,5 @@ export function UserRowActions({ userId, username, onDeleted, onEdit }: UserRowA
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
-  );
+  )
 }

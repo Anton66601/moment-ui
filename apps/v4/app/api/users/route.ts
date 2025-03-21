@@ -14,6 +14,7 @@ export async function GET() {
       select: {
         id: true,
         username: true,
+        email: true,
         contact: true,
         createdAt: true,
       },
@@ -70,7 +71,6 @@ export async function POST(req: NextRequest) {
     );
   }
 }
-
   
 // DELETE /api/users
 export async function DELETE(req: NextRequest) {
@@ -91,31 +91,6 @@ export async function DELETE(req: NextRequest) {
 }
 
 
-
 // PATCH /api/users
-export async function PATCH(req: NextRequest) {
-  try {
-    const { id, username, email, contact } = await req.json();
 
-    if (!id || (!username && !email && !contact)) {
-      return NextResponse.json(
-        { success: false, error: "ID and at least one field (username, email, or contact) are required." },
-        { status: 400 }
-      );
-    }
 
-    const updatedUser = await prisma.user.update({
-      where: { id },
-      data: {
-        ...(username && { username }),
-        ...(email && { email }),
-        ...(contact && { contact }),
-      },
-    });
-
-    return NextResponse.json({ success: true, user: updatedUser });
-  } catch (error) {
-    console.error("Error updating user:", error);
-    return NextResponse.json({ success: false, error: "Failed to update user." }, { status: 500 });
-  }
-}
