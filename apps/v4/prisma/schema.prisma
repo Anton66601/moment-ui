@@ -20,6 +20,7 @@ model Event {
   updatedAt   DateTime   @updatedAt
 
   eventType   EventType? @relation("EventTypeToEvent", fields: [type], references: [id])
+  user        User?      @relation("UserToEvent", fields: [createdBy], references: [id])
 }
 
 model EventType {
@@ -30,4 +31,14 @@ model EventType {
   events Event[] @relation("EventTypeToEvent")
 }
 
+model User {
+  id        String   @id @default(cuid())
+  username  String   @unique
+  email     String   @unique
+  contact   String
+  password  String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
+  events    Event[]  @relation("UserToEvent")
+}
