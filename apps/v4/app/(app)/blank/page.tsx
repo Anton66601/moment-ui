@@ -16,8 +16,11 @@ import { EventSearchBar } from "@/components/my components/event-search-bar"
 import { PaginationControls } from "@/components/my components/PaginationControls"
 import { ColumnToggle } from "@/components/my components/column-toggle"
 import { EventChekbox } from "@/components/my components/checkbox-event"
-// import { EventAlertDialog } from "@/components/my components/event-alert-dialog"
+import { EventAlertDialog } from "@/components/my components/event-alert-dialog"
 import { AlertEvent } from "@/components/my components/alert"
+import { EventCombobox } from "@/components/combobox/event-combobox"
+import { UserCombobox } from "@/components/combobox/user-combobox"
+import { TimezoneCombobox } from "@/components/combobox/timezone-combobox"
 
 export default function BlankPage() {
   return (
@@ -39,16 +42,19 @@ export default function BlankPage() {
       {/* < EventChekbox/> */}
       {/* < EventAlertDialog/> */}
       {/* < AlertEvent/> */}
+      < EventCombobox/>
+      < UserCombobox/>
+      < TimezoneCombobox/>
 
 
       {/* cards */}
       {/* <div className="rounded-lg border bg-card p-6 shadow-sm">
         <FormEvent />
-        </div> */}
+      </div> */}
 
       {/* <div className="rounded-lg border bg-card p-6 shadow-sm">
-      </div> */}
       < EventTable/>
+      </div> */}
 
 
       
