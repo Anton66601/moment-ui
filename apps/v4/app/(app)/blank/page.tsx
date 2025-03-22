@@ -21,6 +21,7 @@ import { AlertEvent } from "@/components/my components/structure/alert"
 import { EventCombobox } from "@/components/combobox/event-combobox"
 import { UserCombobox } from "@/components/combobox/user-combobox"
 import { TimezoneCombobox } from "@/components/combobox/timezone-combobox"
+import { PickDate } from "@/components/my components/date/pick-date"
 
 export default function BlankPage() {
   return (
@@ -35,7 +36,7 @@ export default function BlankPage() {
       {/* ---ME--- */}
       {/* <ComboboxEvent /> */}
       {/* <FormEvent /> */}
-      <DatePickerEvent />
+      {/* <DatePickerEvent /> */}
       {/* <EventSearchBar /> */}
       {/* <PaginationControls /> */}
       {/* <ColumnToggle /> */}
@@ -45,6 +46,10 @@ export default function BlankPage() {
       {/* < EventCombobox/> */}
       {/* < UserCombobox/> */}
       {/* < TimezoneCombobox/> */}
+
+      <div className="rounded-lg border bg-card p-4 shadow-sm max-w-sm">
+  <PickDate />
+</div>
 
 
       {/* cards */}
