@@ -47,20 +47,20 @@ export default function BlankPage() {
       {/* < UserCombobox/> */}
       {/* < TimezoneCombobox/> */}
 
-      <div className="rounded-lg border bg-card p-4 shadow-sm max-w-sm">
-  <PickDate />
-</div>
+      {/* <div className="rounded-lg border bg-card p-4 shadow-sm max-w-sm">
+        <PickDate />
+      </div> */}
 
 
       {/* cards */}
-      {/* <div className="rounded-lg border bg-card p-6 shadow-sm">
+      <div className="rounded-lg border bg-card p-6 shadow-sm">
         <FormEvent />
       </div>
-      <hr /> */}
+      <hr />
 
-      {/* <div className="rounded-lg border bg-card p-6 shadow-sm">
+      <div className="rounded-lg border bg-card p-6 shadow-sm">
       < EventTable/>
-      </div> */}
+      </div>
 
 
       

@@ -19,11 +19,11 @@ import { Textarea } from "@/registry/new-york-v4/ui/textarea"
 import { Switch } from "@/registry/new-york-v4/ui/switch"
 import { Button } from "@/registry/new-york-v4/ui/button"
 
-import { DatePickerEvent } from "@/components/my components/date/DatePicker"
 import { EventCombobox } from "@/components/combobox/event-combobox"
 import { UserCombobox } from "@/components/combobox/user-combobox"
 import { TimezoneCombobox } from "@/components/combobox/timezone-combobox"
 import { EventCreationModal } from "@/components/my components/modals/event-creation-modal"
+import { PickDate } from "@/components/my components/date/pick-date"
 
 const formSchema = z.object({
   name: z.string().min(2, "Nombre requerido"),
@@ -31,6 +31,12 @@ const formSchema = z.object({
   isPublic: z.boolean().default(true),
   eventTypeId: z.string().min(1),
   userId: z.string().min(1),
+  eventDate: z.object({
+    from: z.date(),
+    to: z.date().optional(),
+  }),
+  startTime: z.string().optional(),
+  endTime: z.string().optional(),
 })
 
 export function FormEvent() {
@@ -52,8 +58,10 @@ export function FormEvent() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           ...data,
-          date: new Date().toISOString(),
-          timezone: "America/Mexico_City", // fijo
+          date: data.eventDate.from,
+          timeStart: data.startTime,
+          timeEnd: data.endTime,
+          timezone: "America/Mexico_City",
           createdBy: data.userId,
         }),
       })
@@ -131,12 +139,23 @@ export function FormEvent() {
           <div className="space-y-4">
             <h3 className="text-base font-semibold">Detalles del evento</h3>
 
-            <div>
-              <FormLabel>Fecha del evento</FormLabel>
-              <div className="pt-2">
-                <DatePickerEvent />
-              </div>
-            </div>
+            <FormField
+              control={form.control}
+              name="eventDate"
+              render={() => (
+                <FormItem>
+                  <FormLabel>Fecha del evento</FormLabel>
+                  <FormControl>
+                    <PickDate
+                      name="eventDate"
+                      control={form.control}
+                      timeFromName="startTime"
+                      timeToName="endTime"
+                    />
+                  </FormControl>
+                </FormItem>
+              )}
+            />
 
             <div>
               <FormLabel>Zona horaria</FormLabel>
@@ -201,7 +220,7 @@ export function FormEvent() {
 
         {/* ✅ Modal fuera del <form> */}
         <EventCreationModal
-          open={false} // Puedes controlar esto desde contexto si lo necesitas
+          open={false}
           onOpenChange={() => {}}
           onCreate={() => {}}
         />
