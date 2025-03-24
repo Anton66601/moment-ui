@@ -106,5 +106,39 @@ export async function DELETE(req: NextRequest) {
 
 
 // PATCH /api/users
+export async function PATCH(req: NextRequest) {
+  const { searchParams } = new URL(req.url);
+  const id = searchParams.get("id");
 
+  if (!id) {
+    return NextResponse.json(
+      { success: false, error: "User ID is required." },
+      { status: 400 }
+    );
+  }
 
+  try {
+    const { username, email, contact, password } = await req.json();
+
+    const dataToUpdate: any = {};
+    if (username) dataToUpdate.username = username;
+    if (email) dataToUpdate.email = email;
+    if (contact) dataToUpdate.contact = contact;
+    if (password) {
+      dataToUpdate.password = await bcrypt.hash(password, 10);
+    }
+
+    const updatedUser = await prisma.user.update({
+      where: { id },
+      data: dataToUpdate,
+    });
+
+    return NextResponse.json({ success: true, user: updatedUser });
+  } catch (error) {
+    console.error("Error updating user:", error);
+    return NextResponse.json(
+      { success: false, error: "Failed to update user." },
+      { status: 500 }
+    );
+  }
+}

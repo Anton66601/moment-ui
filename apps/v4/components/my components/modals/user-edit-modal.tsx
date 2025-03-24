@@ -115,8 +115,7 @@ export function UserEditModal({
         payload.password = password
       }
 
-      // Usamos el ID en la ruta: /api/users/:id
-      const res = await fetch(`/api/users/${user.id}`, {
+      const res = await fetch(`/api/users?id=${user.id}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
