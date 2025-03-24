@@ -30,7 +30,7 @@ export function UserRowActions({
         toast.success(`"${username}" eliminado`)
         onDeleted?.()
       } else {
-        toast.error("No se pudo eliminar el usuario.")
+        toast.error(data.error || "No se pudo eliminar el usuario.")
       }
     } catch (err) {
       toast.error("Ocurrió un error al eliminar.")

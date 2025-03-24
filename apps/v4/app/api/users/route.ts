@@ -81,6 +81,20 @@ export async function DELETE(req: NextRequest) {
     return NextResponse.json({ success: false, error: "User ID is required." }, { status: 400 })
   }
 
+  const associatedEvents = await prisma.event.findMany({
+    where: { user: { id } }
+  })
+
+  if (associatedEvents.length > 0) {
+    return NextResponse.json(
+      { 
+        success: false, 
+        error: "No se puede eliminar el usuario porque tiene eventos asociados." 
+      },
+      { status: 400 }
+    )
+  }
+
   try {
     await prisma.user.delete({ where: { id } })
     return NextResponse.json({ success: true })
