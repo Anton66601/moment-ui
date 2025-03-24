@@ -52,6 +52,20 @@ export async function DELETE(req: NextRequest) {
       return NextResponse.json({ success: false, error: "ID is required" }, { status: 400 })
     }
 
+    const associatedEvents = await prisma.event.findMany({
+      where: { eventType: { id } }
+    })
+
+    if (associatedEvents.length > 0) {
+      return NextResponse.json(
+        { 
+          success: false, 
+          error: "No se puede eliminar el tipo de evento porque existen eventos asociados." 
+        },
+        { status: 400 }
+      )
+    }
+
     await prisma.eventType.delete({
       where: { id },
     })
@@ -62,6 +76,7 @@ export async function DELETE(req: NextRequest) {
     return NextResponse.json({ success: false, error: "Error deleting event type" }, { status: 500 })
   }
 }
+
 
 // PATCH /api/event-types
 export async function PATCH(req: NextRequest) {

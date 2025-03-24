@@ -28,7 +28,7 @@ export function RowActions({ id, label, onDeleted, onEdit }: RowActionsProps) {
         toast.success(`"${label}" eliminado`)
         onDeleted?.()
       } else {
-        toast.error("No se pudo eliminar el tipo de evento.")
+        toast.error(data.error || "No se pudo eliminar el tipo de evento.")
       }
     } catch (err) {
       toast.error("Ocurrió un error al eliminar.")
