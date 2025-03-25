@@ -23,7 +23,7 @@ export async function POST(req: Request) {
         description: data.description ?? "",
         date: data.date, // ISO string, no convertir
         timezone: data.timezone ?? "UTC",
-        type: data.eventTypeId, // asumiendo que "type" es el ID del tipo de evento
+        type: data.eventTypeId, 
         createdBy: data.userId,
         isPublic: data.isPublic ?? true,
       },
@@ -39,7 +39,7 @@ export async function POST(req: Request) {
   }
 }
 
-// Obtener eventos con paginación
+// Get events with pagination (includes relationship data)
 export async function GET(req: Request) {
   const { searchParams } = new URL(req.url)
 
@@ -61,6 +61,10 @@ export async function GET(req: Request) {
       take: limit,
       orderBy: {
         date: "desc",
+      },
+      include: {
+        eventType: true,
+        user: true,
       },
     }),
     prisma.event.count({

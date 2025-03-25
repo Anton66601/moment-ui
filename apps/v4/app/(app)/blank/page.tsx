@@ -53,10 +53,10 @@ export default function BlankPage() {
 
 
       {/* cards */}
-      <div className="rounded-lg border bg-card p-6 shadow-sm">
+      {/* <div className="rounded-lg border bg-card p-6 shadow-sm">
         <FormEvent />
       </div>
-      <hr />
+      <hr /> */}
 
       <div className="rounded-lg border bg-card p-6 shadow-sm">
       < EventTable/>

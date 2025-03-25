@@ -1,6 +1,6 @@
-"use client"
+"use client";
 
-import * as React from "react"
+import * as React from "react";
 import {
   Table,
   TableBody,
@@ -8,130 +8,128 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/registry/new-york-v4/ui/table"
-import { Loader2Icon, CheckCircle2Icon } from "lucide-react"
-import { format } from "date-fns"
-import { PaginationControls } from "@/components/my components/PaginationControls"
-import { ColumnToggle } from "@/components/my components/column-toggle"
-import { EventSearchBar } from "@/components/my components/event-search-bar"
-import { CustomTableCheckbox } from "@/components/my components/custom-table-checkbox"
-import { RowActions } from "@/components/my components/RowActions"
+} from "@/registry/new-york-v4/ui/table";
+import { Loader2Icon, CheckCircle2Icon } from "lucide-react";
+import { format } from "date-fns";
+import { PaginationControls } from "@/components/my components/PaginationControls";
+import { ColumnToggle } from "@/components/my components/column-toggle";
+import { EventSearchBar } from "@/components/my components/event-search-bar";
+import { CustomTableCheckbox } from "@/components/my components/custom-table-checkbox";
+import { RowActions } from "@/components/my components/RowActions";
 import {
   Alert,
   AlertTitle,
   AlertDescription,
-} from "@/registry/new-york-v4/ui/alert"
-import { Button } from "@/registry/new-york-v4/ui/button"
+} from "@/registry/new-york-v4/ui/alert";
+import { Button } from "@/registry/new-york-v4/ui/button";
 
 const defaultColumns = [
   { id: "name", label: "Nombre", visible: true },
   { id: "type", label: "Tipo", visible: true },
   { id: "createdBy", label: "Responsable", visible: true },
   { id: "date", label: "Fecha", visible: true },
-  { id: "timezone", label: "Zona horaria", visible: true },
-  { id: "isPublic", label: "Público", visible: true },
-]
+  { id: "timezone", label: "Zona horaria", visible: false },
+  { id: "isPublic", label: "Público", visible: false },
+];
 
 type Event = {
-  id: string
-  name: string
-  type: string
-  createdBy: string
-  date: string
-  timezone: string
-  isPublic: boolean
-}
+  id: string;
+  name: string;
+  eventType: { label: string }; 
+  user: { username: string }; 
+  date: string;
+  timezone: string;
+  isPublic: boolean;
+};
 
 export function EventTable() {
-  const [events, setEvents] = React.useState<Event[]>([])
-  const [selectedRows, setSelectedRows] = React.useState<string[]>([])
-  const [isLoading, setIsLoading] = React.useState(true)
-  const [page, setPage] = React.useState(1)
-  const [totalPages, setTotalPages] = React.useState(1)
-  const [perPage, setPerPage] = React.useState(5)
-  const [search, setSearch] = React.useState("")
-  const [columns, setColumns] = React.useState(defaultColumns)
-  const [deletedEvent, setDeletedEvent] = React.useState<Event | null>(null)
-  const [showUndoAlert, setShowUndoAlert] = React.useState(false)
+  const [events, setEvents] = React.useState<Event[]>([]);
+  const [selectedRows, setSelectedRows] = React.useState<string[]>([]);
+  const [isLoading, setIsLoading] = React.useState(true);
+  const [page, setPage] = React.useState(1);
+  const [totalPages, setTotalPages] = React.useState(1);
+  const [perPage, setPerPage] = React.useState(5);
+  const [search, setSearch] = React.useState("");
+  const [columns, setColumns] = React.useState(defaultColumns);
+  const [deletedEvent, setDeletedEvent] = React.useState<Event | null>(null);
+  const [showUndoAlert, setShowUndoAlert] = React.useState(false);
 
-  const visibleColumns = columns.filter((col) => col.visible).map((col) => col.id)
+  const visibleColumns = columns.filter((col) => col.visible).map((col) => col.id);
 
-  const allSelected = events.length > 0 && selectedRows.length === events.length
-  const someSelected = selectedRows.length > 0 && selectedRows.length < events.length
+  const allSelected = events.length > 0 && selectedRows.length === events.length;
+  const someSelected = selectedRows.length > 0 && selectedRows.length < events.length;
 
   const toggleAll = (checked: boolean) => {
-    setSelectedRows(checked ? events.map((e) => e.id) : [])
-  }
+    setSelectedRows(checked ? events.map((e) => e.id) : []);
+  };
 
   const toggleRow = (id: string) => {
     setSelectedRows((prev) =>
       prev.includes(id) ? prev.filter((r) => r !== id) : [...prev, id]
-    )
-  }
+    );
+  };
 
   const fetchEvents = async () => {
-    setIsLoading(true)
+    setIsLoading(true);
     try {
       const res = await fetch(
         `/api/events?page=${page}&limit=${perPage}&search=${search}`
-      )
-      const data = await res.json()
-      setEvents(data.events)
-      setTotalPages(data.totalPages)
-      setSelectedRows([])
+      );
+      const data = await res.json();
+      setEvents(data.events);
+      setTotalPages(data.totalPages);
+      setSelectedRows([]);
     } catch (error) {
-      console.error("Error loading events:", error)
+      console.error("Error loading events:", error);
     } finally {
-      setIsLoading(false)
+      setIsLoading(false);
     }
-  }
+  };
 
   React.useEffect(() => {
-    fetchEvents()
-  }, [page, perPage, search])
+    fetchEvents();
+  }, [page, perPage, search]);
 
   const handleToggleColumn = (columnId: string) => {
     setColumns((prev) =>
       prev.map((col) =>
         col.id === columnId ? { ...col, visible: !col.visible } : col
       )
-    )
-  }
+    );
+  };
 
   const handleDeleteSuccess = (deleted: Event) => {
-    setDeletedEvent(deleted)
-    setShowUndoAlert(true)
-    fetchEvents()
-  }
+    setDeletedEvent(deleted);
+    setShowUndoAlert(true);
+    fetchEvents();
+  };
 
   const handleUndo = async () => {
-    if (!deletedEvent) return
+    if (!deletedEvent) return;
     try {
       const res = await fetch("/api/events", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(deletedEvent),
-      })
-      const result = await res.json()
+      });
+      const result = await res.json();
       if (result.success) {
-        setShowUndoAlert(false)
-        fetchEvents()
+        setShowUndoAlert(false);
+        fetchEvents();
       }
     } catch (err) {
-      console.error("Failed to undo deletion:", err)
+      console.error("Failed to undo deletion:", err);
     }
-  }
+  };
 
-  // ⏱️ Ocultar automáticamente el alert después de 5 segundos
   React.useEffect(() => {
     if (showUndoAlert) {
       const timeout = setTimeout(() => {
-        setShowUndoAlert(false)
-      }, 3000)
-
-      return () => clearTimeout(timeout)
+        setShowUndoAlert(false);
+      }, 3000);
+      return () => clearTimeout(timeout);
     }
-  }, [showUndoAlert])
+  }, [showUndoAlert]);
 
   return (
     <div className="space-y-4">
@@ -167,7 +165,9 @@ export function EventTable() {
                 <TableHead className="h-12 px-4 align-middle">Zona horaria</TableHead>
               )}
               {visibleColumns.includes("isPublic") && (
-                <TableHead className="h-12 px-4 text-center align-middle">Público</TableHead>
+                <TableHead className="h-12 px-4 text-center align-middle">
+                  Público
+                </TableHead>
               )}
               <TableHead className="h-12 px-4 text-right">Acciones</TableHead>
             </TableRow>
@@ -181,10 +181,7 @@ export function EventTable() {
               </TableRow>
             ) : events.length === 0 ? (
               <TableRow>
-                <TableCell
-                  colSpan={8}
-                  className="text-center text-sm text-muted-foreground"
-                >
+                <TableCell colSpan={8} className="text-center text-sm text-muted-foreground">
                   No hay eventos disponibles.
                 </TableCell>
               </TableRow>
@@ -207,12 +204,12 @@ export function EventTable() {
                   )}
                   {visibleColumns.includes("type") && (
                     <TableCell className="h-12 px-4 align-middle text-sm">
-                      {event.type}
+                      {event.eventType?.label || "N/A"}
                     </TableCell>
                   )}
                   {visibleColumns.includes("createdBy") && (
                     <TableCell className="h-12 px-4 align-middle text-sm">
-                      {event.createdBy}
+                      {event.user?.username || "N/A"}
                     </TableCell>
                   )}
                   {visibleColumns.includes("date") && (
@@ -277,5 +274,5 @@ export function EventTable() {
         </div>
       )}
     </div>
-  )
+  );
 }
