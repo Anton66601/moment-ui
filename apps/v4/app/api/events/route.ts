@@ -102,3 +102,42 @@ export async function DELETE(req: Request) {
     )
   }
 }
+
+// PATCH: Actualizar un evento (por ejemplo, cambiar el responsable)
+export async function PATCH(req: Request) {
+  try {
+    // Extraer el ID desde la query string
+    const { searchParams } = new URL(req.url)
+    const id = searchParams.get("id")
+
+    if (!id) {
+      return NextResponse.json(
+        { success: false, error: "ID es requerido" },
+        { status: 400 }
+      )
+    }
+
+    // Extraer los datos del body (en este caso, se espera { userId: string })
+    const data = await req.json()
+
+    // Construir el objeto de actualización
+    const updateData: any = {}
+    if (data.userId !== undefined) {
+      updateData.createdBy = data.userId
+    }
+    // Si quisieras permitir la actualización de otros campos, puedes agregarlos aquí
+
+    const updatedEvent = await prisma.event.update({
+      where: { id },
+      data: updateData,
+    })
+
+    return NextResponse.json({ success: true, event: updatedEvent })
+  } catch (error) {
+    console.error("Error updating event:", error)
+    return NextResponse.json(
+      { success: false, error: "Error updating event" },
+      { status: 500 }
+    )
+  }
+}

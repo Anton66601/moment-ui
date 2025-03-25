@@ -1,3 +1,5 @@
+// apps/v4/components/my components/event-table.tsx
+
 "use client";
 
 import * as React from "react";
@@ -25,7 +27,7 @@ import { Button } from "@/registry/new-york-v4/ui/button";
 
 const defaultColumns = [
   { id: "name", label: "Nombre", visible: true },
-  { id: "type", label: "Tipo", visible: true },
+  { id: "type", label: "Tipo", visible: false },
   { id: "createdBy", label: "Responsable", visible: true },
   { id: "date", label: "Fecha", visible: true },
   { id: "timezone", label: "Zona horaria", visible: false },
@@ -156,7 +158,7 @@ export function EventTable() {
                 <TableHead className="h-12 px-4 align-middle">Tipo</TableHead>
               )}
               {visibleColumns.includes("createdBy") && (
-                <TableHead className="h-12 px-4 align-middle">Responsable</TableHead>
+                <TableHead className="h-12 px-4 align-middle">By</TableHead>
               )}
               {visibleColumns.includes("date") && (
                 <TableHead className="h-12 px-4 align-middle">Fecha</TableHead>
