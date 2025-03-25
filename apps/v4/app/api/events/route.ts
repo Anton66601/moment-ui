@@ -103,41 +103,50 @@ export async function DELETE(req: Request) {
   }
 }
 
-// PATCH: Actualizar un evento (por ejemplo, cambiar el responsable)
 export async function PATCH(req: Request) {
   try {
-    // Extraer el ID desde la query string
-    const { searchParams } = new URL(req.url)
-    const id = searchParams.get("id")
+    // Extract the ID from the query string
+    const { searchParams } = new URL(req.url);
+    const id = searchParams.get("id");
 
     if (!id) {
       return NextResponse.json(
-        { success: false, error: "ID es requerido" },
+        { success: false, error: "ID is required" },
         { status: 400 }
-      )
+      );
     }
 
-    // Extraer los datos del body (en este caso, se espera { userId: string })
-    const data = await req.json()
+    // Extract data from the request body (expected: { userId: string })
+    const data = await req.json();
 
-    // Construir el objeto de actualización
-    const updateData: any = {}
-    if (data.userId !== undefined) {
-      updateData.createdBy = data.userId
+    // If no userId or an empty userId is provided, consider it as no change.
+    if (data.userId === undefined || data.userId === "") {
+      const currentEvent = await prisma.event.findUnique({
+        where: { id },
+        include: { user: true },
+      });
+      return NextResponse.json({ success: true, event: currentEvent });
     }
-    // Si quisieras permitir la actualización de otros campos, puedes agregarlos aquí
+
+    // Build the update object
+    const updateData: any = {};
+    updateData.createdBy = data.userId;
+    // Additional fields can be added here
 
     const updatedEvent = await prisma.event.update({
       where: { id },
       data: updateData,
-    })
+      include: { user: true }, // Include the relationship to get the updated user info
+    });
 
-    return NextResponse.json({ success: true, event: updatedEvent })
+    return NextResponse.json({ success: true, event: updatedEvent });
   } catch (error) {
-    console.error("Error updating event:", error)
+    console.error("Error updating event:", error);
     return NextResponse.json(
       { success: false, error: "Error updating event" },
       { status: 500 }
-    )
+    );
   }
 }
+
+

@@ -23,6 +23,10 @@ import { UserCombobox } from "@/components/combobox/user-combobox"
 import { TimezoneCombobox } from "@/components/combobox/timezone-combobox"
 import { PickDate } from "@/components/my components/date/pick-date"
 
+
+// More fn
+import { EventTableCbx } from "@/components/my components/tables/event-table-cbx"
+
 export default function BlankPage() {
   return (
     <div className="flex flex-col gap-6 p-4">
@@ -58,10 +62,13 @@ export default function BlankPage() {
       </div>
       <hr /> */}
 
-      <div className="rounded-lg border bg-card p-6 shadow-sm">
+      {/* <div className="rounded-lg border bg-card p-6 shadow-sm">
       < EventTable/>
-      </div>
+      </div> */}
 
+      <div className="rounded-lg border bg-card p-6 shadow-sm">
+      < EventTableCbx/>
+      </div>
 
       
     </div>
