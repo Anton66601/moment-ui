@@ -1,6 +1,6 @@
 // apps/v4/app/api/events/route.ts
 
-import { NextResponse } from "next/server"
+import { NextRequest, NextResponse } from "next/server"
 import { PrismaClient } from "@prisma/client"
 
 const prisma = new PrismaClient()
@@ -105,47 +105,72 @@ export async function DELETE(req: Request) {
 
 export async function PATCH(req: Request) {
   try {
-    // Extract the ID from the query string
-    const { searchParams } = new URL(req.url);
-    const id = searchParams.get("id");
+    const { searchParams } = new URL(req.url)
+    const id = searchParams.get("id")
 
     if (!id) {
       return NextResponse.json(
         { success: false, error: "ID is required" },
         { status: 400 }
-      );
+      )
     }
 
-    // Extract data from the request body (expected: { userId: string })
-    const data = await req.json();
+    const data = await req.json()
+    const { userId, eventTypeId } = data
 
-    // If no userId or an empty userId is provided, consider it as no change.
-    if (data.userId === undefined || data.userId === "") {
-      const currentEvent = await prisma.event.findUnique({
+    const currentEvent = await prisma.event.findUnique({
+      where: { id },
+      select: {
+        id: true,
+        createdBy: true,
+        type: true,
+      },
+    })
+
+    if (!currentEvent) {
+      return NextResponse.json(
+        { success: false, error: "Event not found" },
+        { status: 404 }
+      )
+    }
+
+    const updateData: any = {}
+
+    if (userId !== undefined && userId !== "" && userId !== currentEvent.createdBy) {
+      updateData.createdBy = userId
+    }
+
+    if (eventTypeId !== undefined && eventTypeId !== "" && eventTypeId !== currentEvent.type) {
+      updateData.type = eventTypeId
+    }
+
+    if (Object.keys(updateData).length === 0) {
+      const fullEvent = await prisma.event.findUnique({
         where: { id },
-        include: { user: true },
-      });
-      return NextResponse.json({ success: true, event: currentEvent });
+        include: {
+          user: true,
+          eventType: true,
+        },
+      })
+      return NextResponse.json({ success: true, event: fullEvent })
     }
-
-    // Build the update object
-    const updateData: any = {};
-    updateData.createdBy = data.userId;
-    // Additional fields can be added here
 
     const updatedEvent = await prisma.event.update({
       where: { id },
       data: updateData,
-      include: { user: true }, // Include the relationship to get the updated user info
-    });
+      include: {
+        user: true,
+        eventType: true,
+      },
+    })
 
-    return NextResponse.json({ success: true, event: updatedEvent });
+    return NextResponse.json({ success: true, event: updatedEvent })
   } catch (error) {
-    console.error("Error updating event:", error);
+    console.error("Error updating event:", error instanceof Error ? error.message : error)
     return NextResponse.json(
       { success: false, error: "Error updating event" },
       { status: 500 }
-    );
+    )
   }
 }
 

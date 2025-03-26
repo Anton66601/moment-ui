@@ -27,7 +27,7 @@ import { EventEditModal } from "@/components/my components/modals/event-edit-mod
 import { RowActions } from "@/components/shared/row-actions"
 import { toast } from "sonner"
 
-type Event = {
+type EventType = {
   value: string
   label: string
 }
@@ -45,9 +45,16 @@ export function EventCombobox({ value, onChange, isInvalid, errorMessage }: Prop
   const selectedValue = value ?? internalValue
   const setSelectedValue = onChange ?? setInternalValue
 
-  const [events, setEvents] = React.useState<Event[]>([])
+  const [events, setEvents] = React.useState<EventType[]>([])
   const [showModal, setShowModal] = React.useState(false)
-  const [editingEvent, setEditingEvent] = React.useState<Event | null>(null)
+  const [editingEvent, setEditingEvent] = React.useState<EventType | null>(null)
+
+  // Sincronizar prop externa con estado interno
+  React.useEffect(() => {
+    if (value !== undefined) {
+      setInternalValue(value)
+    }
+  }, [value])
 
   React.useEffect(() => {
     const fetchEvents = async () => {
@@ -72,23 +79,23 @@ export function EventCombobox({ value, onChange, isInvalid, errorMessage }: Prop
 
   const handleCreate = () => setShowModal(true)
 
-  const handleModalCreate = (newEvent: Event) => {
+  const handleModalCreate = (newEvent: EventType) => {
     setEvents((prev) => [...prev, newEvent])
     setSelectedValue(newEvent.value)
     setShowModal(false)
     setOpen(false)
   }
 
-  const handleEdit = (event: Event) => setEditingEvent(event)
+  const handleEdit = (event: EventType) => setEditingEvent(event)
 
-  const handleUpdate = (updatedEvent: Event) => {
+  const handleUpdate = (updatedEvent: EventType) => {
     setEvents((prev) =>
       prev.map((e) => (e.value === updatedEvent.value ? updatedEvent : e))
     )
     setEditingEvent(null)
   }
 
-  const handleDelete = async (event: Event) => {
+  const handleDelete = async (event: EventType) => {
     try {
       const res = await fetch(`/api/event-types?id=${event.value}`, {
         method: "DELETE",
