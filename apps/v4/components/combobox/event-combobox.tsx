@@ -26,6 +26,7 @@ import { EventCreationModal } from "@/components/my components/modals/event-crea
 import { EventEditModal } from "@/components/my components/modals/event-edit-modal"
 import { RowActions } from "@/components/shared/row-actions"
 import { toast } from "sonner"
+import { useEventTypes } from "@/app/context/event-types-context"
 
 type EventType = {
   value: string
@@ -45,42 +46,17 @@ export function EventCombobox({ value, onChange, isInvalid, errorMessage }: Prop
   const selectedValue = value ?? internalValue
   const setSelectedValue = onChange ?? setInternalValue
 
-  const [events, setEvents] = React.useState<EventType[]>([])
+  const { eventTypes, setEventTypes } = useEventTypes()
+
   const [showModal, setShowModal] = React.useState(false)
   const [editingEvent, setEditingEvent] = React.useState<EventType | null>(null)
 
-  // Sincronizar prop externa con estado interno
-  React.useEffect(() => {
-    if (value !== undefined) {
-      setInternalValue(value)
-    }
-  }, [value])
-
-  React.useEffect(() => {
-    const fetchEvents = async () => {
-      try {
-        const res = await fetch("/api/event-types")
-        const data = await res.json()
-        if (data.success) {
-          const formatted = data.eventTypes.map((e: any) => ({
-            value: e.id,
-            label: e.label,
-          }))
-          setEvents(formatted)
-        }
-      } catch (err) {
-        console.error("Error fetching event types:", err)
-        toast.error("Error al cargar tipos de evento")
-      }
-    }
-
-    fetchEvents()
-  }, [])
+  const selectedLabel = eventTypes.find((e) => e.value === selectedValue)?.label
 
   const handleCreate = () => setShowModal(true)
 
   const handleModalCreate = (newEvent: EventType) => {
-    setEvents((prev) => [...prev, newEvent])
+    setEventTypes((prev) => [...prev, newEvent])
     setSelectedValue(newEvent.value)
     setShowModal(false)
     setOpen(false)
@@ -88,9 +64,9 @@ export function EventCombobox({ value, onChange, isInvalid, errorMessage }: Prop
 
   const handleEdit = (event: EventType) => setEditingEvent(event)
 
-  const handleUpdate = (updatedEvent: EventType) => {
-    setEvents((prev) =>
-      prev.map((e) => (e.value === updatedEvent.value ? updatedEvent : e))
+  const handleUpdate = (updated: EventType) => {
+    setEventTypes((prev) =>
+      prev.map((e) => (e.value === updated.value ? updated : e))
     )
     setEditingEvent(null)
   }
@@ -103,7 +79,7 @@ export function EventCombobox({ value, onChange, isInvalid, errorMessage }: Prop
       const result = await res.json()
 
       if (result.success) {
-        setEvents((prev) => prev.filter((e) => e.value !== event.value))
+        setEventTypes((prev) => prev.filter((e) => e.value !== event.value))
         toast.success("Tipo de evento eliminado")
         if (event.value === selectedValue) setSelectedValue("")
       } else {
@@ -113,8 +89,6 @@ export function EventCombobox({ value, onChange, isInvalid, errorMessage }: Prop
       toast.error("Ocurrió un error al eliminar el tipo de evento.")
     }
   }
-
-  const selectedLabel = events.find((e) => e.value === selectedValue)?.label
 
   return (
     <div className="space-y-1.5">
@@ -139,7 +113,7 @@ export function EventCombobox({ value, onChange, isInvalid, errorMessage }: Prop
             <CommandList>
               <CommandEmpty>No hay coincidencias.</CommandEmpty>
               <CommandGroup>
-                {events.map((event) => (
+                {eventTypes.map((event) => (
                   <div key={event.value} className="flex items-center justify-between pr-2">
                     <CommandItem
                       value={event.value}
@@ -161,7 +135,9 @@ export function EventCombobox({ value, onChange, isInvalid, errorMessage }: Prop
                       label={event.label}
                       onEdit={() => handleEdit(event)}
                       onDeleted={() => {
-                        setEvents((prev) => prev.filter((e) => e.value !== event.value))
+                        setEventTypes((prev) =>
+                          prev.filter((e) => e.value !== event.value)
+                        )
                         if (event.value === selectedValue) setSelectedValue("")
                       }}
                     />
@@ -179,10 +155,6 @@ export function EventCombobox({ value, onChange, isInvalid, errorMessage }: Prop
           </Command>
         </PopoverContent>
       </Popover>
-
-      {/* {isInvalid && errorMessage && (
-        <p className="text-sm text-red-500">{errorMessage}</p>
-      )} */}
 
       <EventCreationModal
         open={showModal}

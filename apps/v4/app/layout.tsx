@@ -7,6 +7,9 @@ import { ThemeProvider } from "@/components/theme-provider"
 import { Toaster } from "@/registry/new-york-v4/ui/sonner"
 import { siteConfig } from "@/www/config/site"
 
+import { EventTypesProvider } from "@/app/context/event-types-context"
+
+
 import "./globals.css"
 
 const fontSans = FontSans({
@@ -113,11 +116,14 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
-          {children}
-          <Toaster />
-          <Analytics />
+          <EventTypesProvider>
+            {children}
+            <Toaster />
+            <Analytics />
+          </EventTypesProvider>
         </ThemeProvider>
       </body>
     </html>
   )
 }
+
