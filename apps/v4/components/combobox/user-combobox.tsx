@@ -27,6 +27,7 @@ import { toast } from "sonner"
 import { UserCreationModal } from "@/components/my components/modals/user-creation-modal"
 import { UserEditModal } from "@/components/my components/modals/user-edit-modal"
 import { UserRowActions } from "@/components/shared/user-row-actions"
+import { useUsers } from "@/app/context/users-context"
 
 export type User = {
   id: string
@@ -48,27 +49,13 @@ export function UserCombobox({ value, onChange, isInvalid, errorMessage }: Props
   const selectedValue = value ?? internalValue
   const setSelectedValue = onChange ?? setInternalValue
 
-  const [users, setUsers] = React.useState<User[]>([])
+  const { users, setUsers } = useUsers()
+
   const [showModal, setShowModal] = React.useState(false)
   const [editModalOpen, setEditModalOpen] = React.useState(false)
   const [userToEdit, setUserToEdit] = React.useState<User | null>(null)
 
-  React.useEffect(() => {
-    const fetchUsers = async () => {
-      try {
-        const res = await fetch("/api/users")
-        const data = await res.json()
-        if (data.success) {
-          setUsers(data.users)
-        } else {
-          toast.error("Error al cargar usuarios")
-        }
-      } catch (err) {
-        toast.error("Ocurrió un error al cargar usuarios.")
-      }
-    }
-    fetchUsers()
-  }, [])
+  const selectedUser = users.find((u) => u.id === selectedValue)
 
   const handleCreate = () => setShowModal(true)
 
@@ -96,8 +83,6 @@ export function UserCombobox({ value, onChange, isInvalid, errorMessage }: Props
     setEditModalOpen(false)
     setUserToEdit(null)
   }
-
-  const selectedUser = users.find((u) => u.id === selectedValue)
 
   return (
     <div className="space-y-1.5">
@@ -171,10 +156,6 @@ export function UserCombobox({ value, onChange, isInvalid, errorMessage }: Props
           </Command>
         </PopoverContent>
       </Popover>
-
-      {/* {isInvalid && errorMessage && (
-        <p className="text-sm text-red-500">{errorMessage}</p>
-      )} */}
 
       <UserCreationModal
         open={showModal}

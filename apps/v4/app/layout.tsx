@@ -8,7 +8,7 @@ import { Toaster } from "@/registry/new-york-v4/ui/sonner"
 import { siteConfig } from "@/www/config/site"
 
 import { EventTypesProvider } from "@/app/context/event-types-context"
-
+import { UsersProvider } from "@/app/context/users-context"
 
 import "./globals.css"
 
@@ -116,14 +116,15 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
-          <EventTypesProvider>
-            {children}
-            <Toaster />
-            <Analytics />
-          </EventTypesProvider>
+          <UsersProvider>
+            <EventTypesProvider>
+              {children}
+              <Toaster />
+              <Analytics />
+            </EventTypesProvider>
+          </UsersProvider>
         </ThemeProvider>
       </body>
     </html>
   )
 }
-
